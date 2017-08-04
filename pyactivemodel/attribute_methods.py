@@ -21,30 +21,30 @@ def _make_wrapper(target, attr):
 class AttributeMethodsMixin(metaclass=ActiveModelBase):
     @classmethod
     def classinit_include(cls):
-        cls.attribute_method_matchers = []
+        cls._attribute_method_matchers = []
 
     @classmethod
     def classinit_include_post(cls):
-        del cls.attribute_method_matchers
+        del cls._attribute_method_matchers
 
     @classmethod
     def attribute_method_prefix(cls, *args):
         for arg in args:
-            cls.attribute_method_matchers.append(
+            cls._attribute_method_matchers.append(
                 functools.partial(lambda a, b: a+b, a=arg))
 
     @classmethod
     def attribute_method_suffix(cls, *args):
         for arg in args:
-            cls.attribute_method_matchers.append(
+            cls._attribute_method_matchers.append(
                 functools.partial(lambda a, b: a+b, b=arg))
 
     @classmethod
     def define_attribute_methods(cls, *args):
-        for matcher in cls.attribute_method_matchers:
+        for matcher in cls._attribute_method_matchers:
             target = getattr(cls, matcher('attribute'))
             for attribute in args:
                 setattr(cls, matcher(attribute),
                         _make_wrapper(target, attribute))
 
-        cls.attribute_method_matchers = []
+        cls._attribute_method_matchers = []
